@@ -15,18 +15,18 @@ attrs==21.4.0
 charset-normalizer==2.0.12
     # via aiohttp
 cloudevents==1.2.0
-    # via -r src/requirements.in
+    # via -r requirements.in
 dapr==1.6.0
-    # via -r src/requirements.in
+    # via -r requirements.in
 deprecation==2.1.0
     # via cloudevents
 frozenlist==1.3.0
     # via
     #   aiohttp
     #   aiosignal
-grpcio==1.44.0
+grpcio==1.46.3
     # via
-    #   -r src/requirements.in
+    #   -r requirements.in
     #   dapr
 idna==3.3
     # via yarl
@@ -38,7 +38,7 @@ packaging==21.3
     # via deprecation
 protobuf==3.19.4
     # via
-    #   -r src/requirements.in
+    #   -r requirements.in
     #   dapr
 pyparsing==3.0.8
     # via packaging
