@@ -1,0 +1,11 @@
+imageSeatAdjusterApp:
+  name: seatadjuster
+  repository: local/seatadjuster
+  pullPolicy: Always
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "#SuccessfulExecutionOfReleaseWorkflowUpdatesThisValueToReleaseVersionWithoutV#"
+  daprAppid: seatadjuster
+  daprPort: 50008
+
+nameOverride: ""
+fullnameOverride: ""

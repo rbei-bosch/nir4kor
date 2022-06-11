@@ -1,0 +1,135 @@
+# /********************************************************************************
+# * Copyright (c) 2021 Contributors to the Eclipse Foundation
+# *
+# * See the NOTICE file(s) distributed with this work for additional
+# * information regarding copyright ownership.
+# *
+# * This program and the accompanying materials are made available under the
+# * terms of the Eclipse Public License 2.0 which is available at
+# * http://www.eclipse.org/legal/epl-2.0
+# *
+# * SPDX-License-Identifier: EPL-2.0
+# ********************************************************************************/
+
+name: Build base images
+
+on:
+  workflow_dispatch:
+
+jobs:
+  initialize-matrix:
+    runs-on: ubuntu-latest
+    name: Setting up build matrix
+    outputs:
+      deployment-matrix: ${{ steps.export-deployment-matrix.outputs.deployment-matrix }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Get matrix data
+        id: export-deployment-matrix
+        shell: pwsh
+        run: |
+          SITE_PACKAGES=$(python -m site --user-site)
+          sed -i "s|SITE_PACKAGES|$SITE_PACKAGES|g" ./vehicleApp.json
+          MATRIX=$(cat ./vehicleApp.json | tr '\n' ' ')
+
+          echo "::set-output name=deployment-matrix::$MATRIX"
+
+  build-base-images:
+    name: "Building base image (${{ matrix.component.Name }})"
+    runs-on: ubuntu-latest
+    needs: initialize-matrix
+    strategy:
+      matrix:
+        component: ${{ fromJson(needs.initialize-matrix.outputs.deployment-matrix) }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Check Docker version
+        run: docker --version
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - id: github-repository-name-case-adjusted
+        name: Prepare repository name in lower case for docker upload. This supports repository names in mixed case
+        uses: ASzc/change-string-case-action@v1
+        with:
+          string: ${{ github.repository }}
+
+      - name: "${{ matrix.component.Name }} -- Build base multi-arch image"
+        id: image_build
+        uses: docker/build-push-action@v2
+        with:
+          pull: true
+          push: false
+          outputs: |
+            type=oci,dest=./${{ matrix.component.Name }}-base.tar
+          context: ${{ matrix.component.DockerFolder }}
+          file: ${{ matrix.component.Folder }}/Dockerfile.base
+          platforms: linux/amd64,linux/aarch64
+          labels: |
+            org.opencontainers.image.source=https://github.com/${{steps.github-repository-name-case-adjusted.outputs.lowercase}}
+
+      - name: "${{ matrix.component.Name }} -- Inspect tar image with skopeo"
+        run: |
+          skopeo inspect --raw oci-archive:${{ matrix.component.Name }}-base.tar | jq
+          skopeo inspect oci-archive:${{ matrix.component.Name }}-base.tar
+          skopeo copy oci-archive:${{ matrix.component.Name }}-base.tar docker-archive:${{ matrix.component.Name }}-base-arch.tar
+
+      - name: "${{ matrix.component.Name }} -- Scan base docker image for vulnerabilities"
+        uses: aquasecurity/trivy-action@0.0.18
+        with:
+          input: ${{ matrix.component.Name }}-base-arch.tar
+          exit-code: '1'
+          ignore-unfixed: true
+          severity: 'CRITICAL,HIGH'
+          format: 'template'
+          template: '@.github/scripts/junit.tpl'
+          output: 'junit.xml'
+
+      - name: "${{ matrix.component.Name }} -- Show base image scan results"
+        if: ${{ always() }}
+        run: cat ./junit.xml
+
+      - name: "${{ matrix.component.Name }} -- Upload base image trivy report as artifacts"
+        if: ${{ always() && steps.image_build.outcome == 'success' }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: test-results
+          path: |
+            results/Documentation/renderer/*
+
+      - name: "${{ matrix.component.Name }} -- Publish base image trivy scan results"
+        uses: EnricoMi/publish-unit-test-result-action@v1
+        if: ${{ always() && steps.image_build.outcome == 'success' }}
+        with:
+          check_name: Trivy Base Image Scan Results (${{ matrix.component.Name }})
+          comment_title: Trivy Base Image Scan Results (${{ matrix.component.Name }})
+          files: ./junit.xml
+
+      - name: "${{ matrix.component.Name }} -- Push base image to ghcr"
+        if: ${{ steps.image_build.outcome == 'success' }}
+        env:
+          VAPP_NAME: ${{ matrix.component.Name }}_base
+          VAPP_VERSION: latest
+          GIT_HUB_REPOSITORY_NAME_LOWER_CASE: ${{ steps.github-repository-name-case-adjusted.outputs.lowercase }}
+        shell: bash
+        run: |
+          skopeo copy --all oci-archive:${{ matrix.component.Name }}-base.tar "docker://ghcr.io/$GIT_HUB_REPOSITORY_NAME_LOWER_CASE/$VAPP_NAME:latest"
+          skopeo inspect --raw "docker://ghcr.io/$GIT_HUB_REPOSITORY_NAME_LOWER_CASE/$VAPP_NAME:$VAPP_VERSION" | jq
+          skopeo inspect "docker://ghcr.io/$GIT_HUB_REPOSITORY_NAME_LOWER_CASE/$VAPP_NAME:$VAPP_VERSION"

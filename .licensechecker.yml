@@ -1,0 +1,7 @@
+whitelist-file-path: ./whitelisted-licenses.txt
+scan-dirs:
+  - path: ./
+    python-version: 3
+    python-pip-included-requirement-files:
+      - requirements-dev.txt
+      - src/requirements.txt
