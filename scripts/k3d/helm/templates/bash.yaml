@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bash
+spec:
+  selector:
+    matchLabels:
+      app: bash
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: bash
+    spec:
+      volumes:
+        - name: pv-storage
+          persistentVolumeClaim:
+            claimName: pv-claim
+      containers:
+      - image: busybox
+        name: bash
+        volumeMounts:
+          - mountPath: "/data"
+            name: pv-storage
+        command: ["ping", "127.0.0.1"]
