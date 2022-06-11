@@ -1,0 +1,7 @@
+src/__pycache__/
+
+github_token.txt
+
+src/requirements-sdv.txt
+
+src/test_run.py

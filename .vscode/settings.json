@@ -1,0 +1,47 @@
+/********************************************************************************
+* Copyright (c) 2021 Contributors to the Eclipse Foundation
+*
+* See the NOTICE file(s) distributed with this work for additional
+* information regarding copyright ownership.
+*
+* This program and the accompanying materials are made available under the
+* terms of the Eclipse Public License 2.0 which is available at
+* http://www.eclipse.org/legal/epl-2.0
+*
+* SPDX-License-Identifier: EPL-2.0
+********************************************************************************/
+
+{
+    "python.linting.mypyEnabled" : false,
+    "python.linting.banditArgs": [
+        "-c setup.cfg"
+      ],
+    "python.linting.pylintEnabled": true,
+    "python.linting.flake8Enabled": true,
+    "python.linting.flake8Args": ["--ignore=E121,E402,F481,E501,F841"],
+    "python.linting.enabled": true,
+    "python.analysis.extraPaths": [
+        "./proto",
+        "./src/vehicle_model",
+        "./src/vehicle_model"
+    ],
+    "vsmqtt.brokerProfiles": [
+        {
+            "name": "mosquitto (k3d)",
+            "host": "localhost",
+            "port": 31883,
+            "clientId": "vsmqtt_client"
+        },
+        {
+            "name": "mosquitto (local)",
+            "host": "localhost",
+            "port": 1883,
+            "clientId": "vsmqtt_client"
+        }
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true,
+    "github-actions.workflows.pinned.workflows": [
+        ".github/workflows/ci.yml"
+    ]
+}

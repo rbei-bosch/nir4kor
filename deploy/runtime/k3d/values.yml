@@ -1,0 +1,10 @@
+imageSeatAdjusterApp:
+  name: seatadjuster
+  repository: k3d-devregistry.localhost:12345/seatadjuster
+  pullPolicy: Always
+  tag: "local"
+  daprAppid: seatadjuster
+  daprPort: 50008
+
+nameOverride: ""
+fullnameOverride: ""
