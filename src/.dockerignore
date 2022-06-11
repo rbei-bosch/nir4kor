@@ -1,0 +1,7 @@
+__pycache__/
+
+github_token.txt
+
+requirements-sdv.txt
+
+test_set_position_request_processor.py

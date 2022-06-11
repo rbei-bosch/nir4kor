@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{.Values.imageSeatService.name}}
+  labels:
+    app: {{.Values.imageSeatService.name}}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{.Values.imageSeatService.name}}
+  template:
+    metadata:
+      labels:
+        app: {{.Values.imageSeatService.name}}
+      annotations:
+        dapr.io/enabled: "true"
+        dapr.io/app-id: "{{.Values.imageSeatService.daprAppid}}"
+        dapr.io/app-port: "{{.Values.imageSeatService.daprAppPort}}"
+        dapr.io/log-level: "{{.Values.imageSeatService.daprLogLevel}}"
+        dapr.io/config: "config"
+        dapr.io/app-protocol: "grpc"
+    spec:
+      containers:
+        - name: seatservice
+          image: {{.Values.imageSeatService.repository}}:{{.Values.imageSeatService.tag}}
+          imagePullPolicy: {{.Values.imageSeatService.pullPolicy}}
+          ports:
+          - name: default
+            containerPort: {{.Values.imageSeatService.daprAppPort}}
+            protocol: TCP
+          env:
+          - name: VEHICLEDATABROKER_DAPR_APP_ID
+            value: {{.Values.imageVehicleDataBroker.daprAppid}}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{.Values.imageSeatService.name}}-nodeport
+spec:
+  type: NodePort
+  selector:
+    app: {{.Values.imageSeatService.name}}
+  ports:
+    - port: {{.Values.imageSeatService.daprAppPort}}
+      targetPort: {{.Values.imageSeatService.daprAppPort}}
+      nodePort: {{.Values.imageSeatService.nodePort}}

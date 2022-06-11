@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{.Values.imageSeatAdjusterApp.name}}
+  labels:
+    app: {{.Values.imageSeatAdjusterApp.name}}
+spec:
+  selector:
+    matchLabels:
+      app: {{.Values.imageSeatAdjusterApp.name}}
+  template:
+    metadata:
+      annotations:
+        dapr.io/enabled: "true"
+        dapr.io/app-id: "{{.Values.imageSeatAdjusterApp.daprAppid}}"
+        dapr.io/app-port: "{{.Values.imageSeatAdjusterApp.daprPort}}"
+        dapr.io/log-level: "debug"
+        dapr.io/config: "config"
+        dapr.io/app-protocol: "grpc"
+      labels:
+        app: {{.Values.imageSeatAdjusterApp.name}}
+        {{- include "helm.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: {{.Values.imageSeatAdjusterApp.name}}
+          image: "{{ .Values.imageSeatAdjusterApp.repository }}:{{ .Values.imageSeatAdjusterApp.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.imageSeatAdjusterApp.pullPolicy }}
