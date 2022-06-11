@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{.Values.imageVehicleDataBroker.name}}
+  labels:
+    app: {{.Values.imageVehicleDataBroker.name}}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{.Values.imageVehicleDataBroker.name}}
+  template:
+    metadata:
+      labels:
+        app: {{.Values.imageVehicleDataBroker.name}}
+      annotations:
+        dapr.io/enabled: "true"
+        dapr.io/app-id: "{{.Values.imageVehicleDataBroker.daprAppid}}"
+        dapr.io/app-port: "{{.Values.imageVehicleDataBroker.daprAppPort}}"
+        dapr.io/log-level: "{{.Values.imageVehicleDataBroker.daprLogLevel}}"
+        dapr.io/config: "config"
+        dapr.io/app-protocol: "grpc"
+    spec:
+      containers:
+        - name: vehicledatabroker
+          image: {{.Values.imageVehicleDataBroker.repository}}:{{.Values.imageVehicleDataBroker.tag}}
+          imagePullPolicy: {{.Values.imageVehicleDataBroker.pullPolicy}}
+          ports:
+            - name: default
+              containerPort: {{.Values.imageVehicleDataBroker.daprAppPort}}
+              protocol: TCP
+          args: ["--dummy-metadata"]
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{.Values.imageVehicleDataBroker.name}}-nodeport
+spec:
+  type: NodePort
+  selector:
+    app: {{.Values.imageVehicleDataBroker.name}}
+  ports:
+    - port: {{.Values.imageVehicleDataBroker.daprAppPort}}
+      targetPort: {{.Values.imageVehicleDataBroker.daprAppPort}}
+      nodePort: {{.Values.imageVehicleDataBroker.nodePort}}

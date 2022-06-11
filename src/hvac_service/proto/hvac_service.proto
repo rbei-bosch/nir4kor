@@ -1,0 +1,60 @@
+/********************************************************************************
+* Copyright (c) 2021 Contributors to the Eclipse Foundation
+*
+* See the NOTICE file(s) distributed with this work for additional
+* information regarding copyright ownership.
+*
+* This program and the accompanying materials are made available under the
+* terms of the Eclipse Public License 2.0 which is available at
+* http://www.eclipse.org/legal/epl-2.0
+*
+* SPDX-License-Identifier: EPL-2.0
+********************************************************************************/
+
+syntax = "proto3";
+
+package hvac_service.v1;
+
+/**
+ * @brief
+ *
+ */
+service HVACService {
+    /* Set Temperature */
+    rpc SetTemperature(SetTemperatureRequestMsg) returns (SetTemperatureResponseMsg);
+
+    /* On Method call */
+    rpc On(OnMsg) returns (OnResponse);
+
+    /* Off Method call */
+    rpc Off(OffMsg) returns (OffResponse);
+}
+
+/**
+ * @brief getSpeedRecommendation messages
+ *
+ */
+message SetTemperatureRequestMsg {
+    float temperature = 1;
+}
+
+message SetTemperatureResponseMsg {
+    float temperature = 1;
+}
+
+/**
+ * @brief DummyMethod messages
+ *
+ */
+
+message OnMsg {
+}
+
+message OnResponse {
+}
+
+message OffMsg {
+}
+
+message OffResponse {
+}
