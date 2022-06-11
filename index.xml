@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Release Documentation - v2.84</title>
+    <link>https://fantastic-fiesta-da4ab8e5.pages.github.io/</link>
+    <description>Recent content on Release Documentation - v2.84</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language><atom:link href="https://fantastic-fiesta-da4ab8e5.pages.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Code Coverage Test</title>
+      <link>https://fantastic-fiesta-da4ab8e5.pages.github.io/reports/CodeCoverage-ffaab863-7587-52b3-baa7-53ddf5fb2eb6.html</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://fantastic-fiesta-da4ab8e5.pages.github.io/reports/CodeCoverage-ffaab863-7587-52b3-baa7-53ddf5fb2eb6.html</guid>
+      <description>Code Coverage Test    the code coverage is 0.9388
+1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69  &amp;lt;?</description>
+    </item>
+    
+    <item>
+      <title>Unit Test Results</title>
+      <link>https://fantastic-fiesta-da4ab8e5.pages.github.io/reports/UnitTest-bf1bc2ad-31ee-32c5-c661-93d61603e405.html</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://fantastic-fiesta-da4ab8e5.pages.github.io/reports/UnitTest-bf1bc2ad-31ee-32c5-c661-93d61603e405.html</guid>
+      <description>Test results for commit &amp;lsquo;b6462217dc072dc8e6540a865386bee36a8155d3&amp;rsquo; run at 0
+   Tests Failures Errors     4 0 0    Results of test suite pytest    The following test where executed in test suite pytest
+ NameExecution TimeResult test_set_position_not_allowed1.024passed test_set_position_allowed3.730passed test_set_position_lt_01.024passed test_set_position__gt_10001.025passed  Original Output    1  &amp;lt;?xml version=&amp;#34;1.0&amp;#34; encoding=&amp;#34;utf-8&amp;#34;?&amp;gt;&amp;lt;testsuites&amp;gt;&amp;lt;testsuite name=&amp;#34;pytest&amp;#34; errors=&amp;#34;0&amp;#34; failures=&amp;#34;0&amp;#34; skipped=&amp;#34;0&amp;#34; tests=&amp;#34;4&amp;#34; time=&amp;#34;6.878&amp;#34; timestamp=&amp;#34;2022-05-19T07:45:45.206240&amp;#34; hostname=&amp;#34;fv-az77-681&amp;#34;&amp;gt;&amp;lt;testcase classname=&amp;#34;test.integration_test&amp;#34; name=&amp;#34;test_set_position_not_allowed&amp;#34; file=&amp;#34;test/integration_test.py&amp;#34; line=&amp;#34;29&amp;#34; time=&amp;#34;1.</description>
+    </item>
+    
+    <item>
+      <title>Unit Test Results</title>
+      <link>https://fantastic-fiesta-da4ab8e5.pages.github.io/reports/UnitTest-f0be8224-a7ba-a0a2-7720-d9397a073d91.html</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://fantastic-fiesta-da4ab8e5.pages.github.io/reports/UnitTest-f0be8224-a7ba-a0a2-7720-d9397a073d91.html</guid>
+      <description>Test results for commit &amp;lsquo;b6462217dc072dc8e6540a865386bee36a8155d3&amp;rsquo; run at 0
+   Tests Failures Errors     4 0 0    Results of test suite pytest    The following test where executed in test suite pytest
+ NameExecution TimeResult test_for_seats_movecomponent0.012passed test_for_seats_movecomponent_set_high_position0.003passed test_for_seats_movecomponent_error_path0.003passed test_for_publish_to_topic0.003passed  Original Output    1  &amp;lt;?xml version=&amp;#34;1.0&amp;#34; encoding=&amp;#34;utf-8&amp;#34;?&amp;gt;&amp;lt;testsuites&amp;gt;&amp;lt;testsuite name=&amp;#34;pytest&amp;#34; errors=&amp;#34;0&amp;#34; failures=&amp;#34;0&amp;#34; skipped=&amp;#34;0&amp;#34; tests=&amp;#34;4&amp;#34; time=&amp;#34;0.253&amp;#34; timestamp=&amp;#34;2022-05-19T07:39:30.202272&amp;#34; hostname=&amp;#34;fv-az203-838&amp;#34;&amp;gt;&amp;lt;testcase classname=&amp;#34;src.SeatAdjusterApp.test_run&amp;#34; name=&amp;#34;test_for_seats_movecomponent&amp;#34; file=&amp;#34;src/SeatAdjusterApp/test_run.py&amp;#34; line=&amp;#34;25&amp;#34; time=&amp;#34;0.</description>
+    </item>
+    
+    <item>
+      <title>Vulnerability Scan Results</title>
+      <link>https://fantastic-fiesta-da4ab8e5.pages.github.io/reports/vulnerability-scan-results.html</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://fantastic-fiesta-da4ab8e5.pages.github.io/reports/vulnerability-scan-results.html</guid>
+      <description>The scan was run on the container that was build using the code of the commit with the hash &amp;lsquo;b6462217dc072dc8e6540a865386bee36a8155d3&amp;rsquo; The number of vulnerabilities found was: &amp;lsquo;0&amp;rsquo;
+Original Output    1 2 3 4  &amp;lt;?xml version=&amp;#34;1.0&amp;#34; ?&amp;gt; &amp;lt;testsuites&amp;gt; &amp;lt;/testsuites&amp;gt;   </description>
+    </item>
+    
+  </channel>
+</rss>
