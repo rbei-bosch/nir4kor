@@ -1,0 +1,5 @@
+grpcio
+protobuf
+dapr
+cloudevents
+-e file:src/vehicle_model
