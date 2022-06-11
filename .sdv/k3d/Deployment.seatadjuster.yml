@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: seatadjuster-deployment
+  labels:
+    app: seatadjuster
+spec:
+  selector:
+    matchLabels:
+      app: seatadjuster
+  template:
+    metadata:
+      labels:
+        app: seatadjuster
+      annotations:
+        dapr.io/enabled: "true"
+        dapr.io/app-id: "seatadjuster"
+        dapr.io/app-port: "50008"
+        dapr.io/log-level: "debug"
+        dapr.io/config: "daprconfig"
+        dapr.io/app-protocol: "grpc"
+    spec:
+      containers:
+      - name: seatadjuster
+        image: k3d-devregistry.localhost:12345/seatadjuster:local
+        ports:
+        - containerPort: 50008

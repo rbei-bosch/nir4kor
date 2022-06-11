@@ -1,0 +1,59 @@
+/********************************************************************************
+* Copyright (c) 2021 Contributors to the Eclipse Foundation
+*
+* See the NOTICE file(s) distributed with this work for additional
+* information regarding copyright ownership.
+*
+* This program and the accompanying materials are made available under the
+* terms of the Eclipse Public License 2.0 which is available at
+* http://www.eclipse.org/legal/epl-2.0
+*
+* SPDX-License-Identifier: EPL-2.0
+********************************************************************************/
+
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"appId": "vehicleapi",
+			"appPort": 50051,
+			"componentsPath": "./.dapr/components",
+			"config": "./.dapr/config.yaml",
+			"appProtocol": "grpc",
+			"label": "daprd-debug-SeatAdjuster-vehicleapi",
+			"type": "daprd",
+			"args": [
+                "-dapr-grpc-port",
+                "52001",
+				"-dapr-http-port",
+				"3501"
+            ],
+		},
+		{
+			"appId": "vehicleapi",
+			"label": "daprd-down-SeatAdjuster-vehicleapi",
+			"type": "daprd-down"
+		},		
+		{
+			"appId": "client",
+			"appPort": 50008,
+			"componentsPath": "./.dapr/components",
+			"config": "./.dapr/config.yaml",
+			"appProtocol": "grpc",
+			"metricsPort": 9091,
+			"label": "daprd-debug-SeatAdjuster-client",
+			"type": "daprd",
+			"args": [
+                "-dapr-grpc-port",
+                "50001",
+				"-dapr-http-port",
+				"3500"
+            ],
+		},
+		{
+			"appId": "client",
+			"label": "daprd-down-SeatAdjuster-client",
+			"type": "daprd-down"
+		}
+	]
+}

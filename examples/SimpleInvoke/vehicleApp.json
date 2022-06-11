@@ -1,0 +1,7 @@
+{
+    "Name": "SimpleInvoke",
+    "Components": [
+        { "Folder": "receiver", "StartProgram": "app.js", "Port": 50051, "IsPublisher": 1 },
+        { "Folder": "sender", "StartProgram": "app.py", "Port": 3500, "IsPublisher": 1 }
+    ]
+}

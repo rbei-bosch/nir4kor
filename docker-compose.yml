@@ -1,0 +1,89 @@
+# /********************************************************************************
+# * Copyright (c) 2021 Contributors to the Eclipse Foundation
+# *
+# * See the NOTICE file(s) distributed with this work for additional
+# * information regarding copyright ownership.
+# *
+# * This program and the accompanying materials are made available under the
+# * terms of the Eclipse Public License 2.0 which is available at
+# * http://www.eclipse.org/legal/epl-2.0
+# *
+# * SPDX-License-Identifier: EPL-2.0
+# ********************************************************************************/
+
+version: '3.9'
+services:
+  ############################
+  # vehicleapi + Dapr sidecar
+  # dapr run --app-id vehicleapi --app-protocol grpc --app-port 50051 --components-path ./.dapr/components --config ./.dapr/config.yaml  python3 ./vehicleapi/vehicleapi.py
+  ############################
+  vehicleapi:
+    build: ./vehicleapi
+    ports:
+      - "50002:50002"
+    depends_on:
+      - mosquitto
+      - placement
+    networks:
+      - dapr-network
+  vehicleapi-dapr:
+    image: "daprio/daprd:edge"
+    command: ["./daprd",
+     "-app-id", "vehicleapi",
+     "-app-port", "50051",
+     "-placement-host-address", "placement:50006",
+     "-components-path", "/components"]
+    volumes:
+        - "./.dapr/components/:/components"
+    depends_on:
+      - vehicleapi
+    network_mode: "service:vehicleapi"
+  ############################
+  # client + Dapr sidecar
+  # dapr run --app-id client --app-protocol grpc --app-port 50008 --config ./.dapr/config.yaml --components-path ./.dapr/components  python3 ./src/client.py 
+  ############################
+  client:
+    build: 
+      dockerfile: ./src/Dockerfile
+      context: .
+
+    depends_on:
+      - mosquitto
+      - placement
+    networks:
+      - dapr-network
+  client-dapr:
+    image: "daprio/daprd:edge"
+    command: ["./daprd",
+    "-app-id", "client",
+    "-app-port", "50008",
+    "-placement-host-address", "placement:50006",
+    "-components-path", "/components"]
+    volumes:
+      - "./.dapr/components/:/components"
+    depends_on:
+      - client
+    network_mode: "service:client"
+  ############################
+  # Dapr placement service
+  ############################
+  placement:
+    image: "daprio/dapr"
+    command: ["./placement", "-port", "50006"]
+    ports:
+      - "50006:50006"
+    networks:
+      - dapr-network
+  ############################
+  # Mosquitto broker
+  ############################
+  mosquitto:
+    image: "eclipse-mosquitto:1.6.9"
+    ports:
+      - "1884:1883"
+      - "9002:9001"      
+    networks:
+      - dapr-network
+networks:
+  dapr-network:
+    driver: bridge

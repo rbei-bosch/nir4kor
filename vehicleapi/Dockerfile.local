@@ -1,0 +1,22 @@
+FROM python:3.9-slim-bullseye
+
+# ENV HTTP_PROXY="http://host.docker.internal:3128"
+# ENV HTTPS_PROXY="http://host.docker.internal:3128"
+# ENV FTP_PROXY="http://host.docker.internal:3128"
+# ENV ALL_PROXY="http://host.docker.internal:3128"
+# ENV NO_PROXY="localhost,127.0.0.1"
+
+RUN apt-get update 
+RUN apt-get upgrade -y
+
+WORKDIR /vehicleapi
+ADD ./* $HOME/vehicleapi/
+RUN pip3 install -r requirements.txt
+
+RUN apt-get update 
+RUN apt-get upgrade -y
+
+EXPOSE 50051
+
+ENTRYPOINT ["python"]
+CMD ["vehicleapi.py"]

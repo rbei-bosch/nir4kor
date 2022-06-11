@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vehicleapi-deployment
+  labels:
+    app: vehicleapi
+spec:
+  selector:
+    matchLabels:
+      app: vehicleapi
+  template:
+    metadata:
+      labels:
+        app: vehicleapi
+      annotations:
+        dapr.io/enabled: "true"
+        dapr.io/app-id: "vehicleapi"
+        dapr.io/app-port: "50051"
+        dapr.io/log-level: "debug"
+        dapr.io/config: "daprconfig"
+        dapr.io/app-protocol: "grpc"
+    spec:
+      containers:
+      - name: vehicleapi
+        image: k3d-devregistry.localhost:12345/vehicleapi:local
+        ports:
+        - containerPort: 50051

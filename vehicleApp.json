@@ -1,0 +1,7 @@
+{
+    "Name": "SeatAdjuster",
+    "Components": [
+        { "Folder": "vehicleapi", "StartProgram": "vehicleapi.py", "Port": 50051, "IsPublisher": 1},
+        { "Name": "client", "Folder": "src", "StartProgram": "client.py", "Port": 50008, "IsPublisher": 1, "DockerFolder": "."}
+    ]
+}

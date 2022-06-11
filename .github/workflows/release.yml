@@ -1,0 +1,260 @@
+# /********************************************************************************
+# * Copyright (c) 2021 Contributors to the Eclipse Foundation
+# *
+# * See the NOTICE file(s) distributed with this work for additional
+# * information regarding copyright ownership.
+# *
+# * This program and the accompanying materials are made available under the
+# * terms of the Eclipse Public License 2.0 which is available at
+# * http://www.eclipse.org/legal/epl-2.0
+# *
+# * SPDX-License-Identifier: EPL-2.0
+# ********************************************************************************/
+
+name: Release workflow
+
+on:
+  release:
+    types: [published, edited]
+
+jobs:
+  initialize-matrix:
+    runs-on: ubuntu-latest
+    name: Setting up build matrix
+    outputs:
+      deployment-matrix: ${{ steps.export-deployment-matrix.outputs.deployment-matrix }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2   
+
+      - name: Get matrix data
+        id: export-deployment-matrix
+        shell: pwsh
+        run: |
+          Import-Module ./.sdv/Sdv.psm1 -Force
+          $MatrixJson = Find-SdvVehicleApp | Get-SdvComponent | ConvertTo-Json -Compress
+          Write-Output "::set-output name=deployment-matrix::$MatrixJson"
+  upload-images:
+    name: "Upload image (${{ matrix.component.Name }})"
+    runs-on: ubuntu-latest
+    needs: initialize-matrix
+    strategy: 
+      matrix: 
+        component: ${{ fromJson(needs.initialize-matrix.outputs.deployment-matrix) }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2      
+
+      - id: get_version
+        uses: battila7/get-version-action@v2
+
+      - run: echo "Using VehicleApp version ${{ steps.get_version.outputs.version-without-v }} from tag"
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Login to OPS Azure Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ${{ secrets.EXTERNAL_OPS_DEFAULT_VCSS_ACR_ENDPOINT }}
+          username: ${{ secrets.EXTERNAL_OPS_DEFAULT_VCSS_ACR_USER }}
+          password: ${{ secrets.EXTERNAL_OPS_DEFAULT_VCSS_ACR_PASSWORD }}
+
+      - id: github-repository-name-case-adjusted
+        name: Prepare repository name in lower case for docker upload. This supports repository names in mixed case
+        uses: ASzc/change-string-case-action@v1
+        with:
+          string: ${{ github.repository }}
+
+      - name: "${{ matrix.component.Name }} -- copy image from ghcr to acr"
+        env:
+          VAPP_NAME: ${{ matrix.component.Name }}
+          COMMIT: ${{ github.sha }}
+          VAPP_VERSION: ${{ steps.get_version.outputs.version-without-v }}
+          GIT_HUB_REPOSITORY_NAME_LOWER_CASE: ${{ steps.github-repository-name-case-adjusted.outputs.lowercase }}  
+          TARGET_REPOSITORY: ${{ secrets.EXTERNAL_OPS_DEFAULT_VCSS_ACR_ENDPOINT }}    
+        run: |
+          echo "Copy vApp image 'docker://ghcr.io/$GIT_HUB_REPOSITORY_NAME_LOWER_CASE/$VAPP_NAME:$COMMIT' to 'docker://$TARGET_REPOSITORY/$VAPP_NAME:$VAPP_VERSION'"
+          skopeo copy --all  "docker://ghcr.io/$GIT_HUB_REPOSITORY_NAME_LOWER_CASE/$VAPP_NAME:$COMMIT" "docker://$TARGET_REPOSITORY/$VAPP_NAME:$VAPP_VERSION"
+
+
+  release-documentation:
+    name: Generate release documentation
+    runs-on: ubuntu-latest
+    env:
+      TEST_RESULT_FOLDER_NAME: test-results
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Clone actions repository 
+        uses: actions/checkout@v2
+        with:
+          repository: SoftwareDefinedVehicle/release-documentation-action
+          ssh-key: ${{ secrets.RELEASE_DOC_ACTION_PRIVATE_KEY }}
+          path: "./.github/actions"      
+
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '14.x'
+
+      - uses: haya14busa/action-cond@v1
+        id: condval
+        with:
+          cond: ${{ !github.event.inputs.name }}
+          if_true: ${{ github.event.inputs.name }}
+          if_false: ${{ github.sha }}
+
+      - name: Wait for CI workflow
+        uses: fountainhead/action-wait-for-check@v1.0.0
+        id: wait-for-CI
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          checkName: "Integration Tests"
+          ref:  ${{ steps.condval.outputs.value }}
+          timeoutSeconds: 600
+
+      - name: Download artifact
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          workflow: ci.yml
+          workflow_conclusion: success
+          commit:  ${{ steps.condval.outputs.value }}
+          path: .vehicleApp/Documentation/Inbox
+
+      - name: Render documentation (test-results)
+        uses: ./.github/actions/render
+        with:
+          inboxPath: .vehicleApp/Documentation/Inbox/test-results
+          outboxPath: .vehicleApp/Documentation/Outbox
+          templatePath: ./.github/actions/templates
+
+      - name: Upload generated documentation as an artifacts
+        uses: actions/upload-artifact@v2
+        if: always()
+        with:
+          name: generated-documentation
+          path: |
+            .vehicleApp/Documentation/Outbox/
+      - name: zip
+        run: |
+          zip -r .vehicleApp/Documentation/release-documentation-md.zip .vehicleApp/Documentation/Outbox
+      - name: Upload assets
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: |
+            .vehicleApp/Documentation/release-documentation-md.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  deploy-stage:
+    runs-on: ubuntu-latest
+    name: Deploy stage
+    needs: [release-documentation]
+    env:
+      OTA_Secret: ${{secrets.OTA_SYSTEM_CREDENTIALS}}      
+
+    defaults:
+      run:
+        shell: bash
+
+    environment:
+      name: Stage
+      url: https://www.bosch-mobility-solutions.com/en/about-us/current-news/software-defined-vehicles/
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Get secret Data
+        id: parse-ota-secret 
+        shell: sh
+        run: |   
+          chmod 0755 ./.sdv/parse-secret.sh
+          sh ./.sdv/parse-secret.sh $OTA_Secret
+
+      - name: test
+        run: echo ${{ env.CONTAINER_REGISTRY }}
+
+      - id: get_version
+        uses: battila7/get-version-action@v2
+
+      - run: echo "Using VehicleApp version ${{ steps.get_version.outputs.version-without-v }} from tag"
+
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '14.x'
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Login to OPS Azure Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ${{ secrets.EXTERNAL_OPS_DEFAULT_VCSS_ACR_ENDPOINT }}
+          username: ${{ secrets.EXTERNAL_OPS_DEFAULT_VCSS_ACR_USER }}
+          password: ${{ secrets.EXTERNAL_OPS_DEFAULT_VCSS_ACR_PASSWORD }}
+
+  upload-helm:
+    runs-on: ubuntu-latest
+    name: Upload helm chart
+    needs: [release-documentation, upload-images]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2       
+
+      - id: get_version
+        uses: battila7/get-version-action@v2
+      
+      - name: Update vehicleapi tag value in the related HelmChart values.yaml
+        uses: fjogeleit/yaml-update-action@master
+        with:
+          valueFile: 'deploy/helm/values.yaml'
+          propertyPath: 'imageSeatAdjusterApp.tag'
+          value: ${{ steps.get_version.outputs.version-without-v }}
+          commitChange: false
+          updateFile: true
+
+      - name: Update client tag value in the related HelmChart values.yaml
+        uses: fjogeleit/yaml-update-action@master
+        with:
+          valueFile: 'deploy/helm/values.yaml'
+          propertyPath: 'imageVehicleApi.tag'
+          value: ${{ steps.get_version.outputs.version-without-v }}
+          commitChange: false
+          updateFile: true
+          
+      - name: Package Helm Chart
+        env:
+          VAPP_VERSION: ${{ steps.get_version.outputs.version-without-v }}
+          COMMIT: ${{ github.sha }}
+        run: |
+          cp -a ./.dapr/config.yaml ./deploy/helm/
+          export HELM_EXPERIMENTAL_OCI=1
+          helm package deploy/helm --version $VAPP_VERSION --app-version $COMMIT
+
+      - name: Login to helm registry
+        env:
+          REGISTRY: ${{ secrets.EXTERNAL_OPS_DEFAULT_VCSS_ACR_ENDPOINT }}
+          USERNAME: ${{ secrets.EXTERNAL_OPS_DEFAULT_VCSS_ACR_USER }}
+          PASSWORD: ${{ secrets.EXTERNAL_OPS_DEFAULT_VCSS_ACR_PASSWORD }}
+        run: |
+          export HELM_EXPERIMENTAL_OCI=1
+          echo $PASSWORD | helm registry login $REGISTRY --username $USERNAME --password-stdin
+
+      - name: Upload helm chart
+        env:
+          VAPP_NAME: "seat-adjuster-app"
+          VAPP_VERSION: ${{ steps.get_version.outputs.version-without-v }}
+          REGISTRY: ${{ secrets.EXTERNAL_OPS_DEFAULT_VCSS_ACR_ENDPOINT }}   
+        run: |
+          export HELM_EXPERIMENTAL_OCI=1
+          helm push $VAPP_NAME-$VAPP_VERSION.tgz oci://$REGISTRY/helm

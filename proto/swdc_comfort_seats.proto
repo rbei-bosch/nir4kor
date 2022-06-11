@@ -1,0 +1,107 @@
+syntax = "proto3";
+
+package swdc.comfort;
+
+/**
+ * @brief 
+ * 
+ */
+service Seats {
+    /* Set the desired seat position */
+    rpc Move(MoveRequest) returns (MoveReply);
+
+    /* Set a seat component position */
+    rpc MoveComponent(MoveComponentRequest) returns (MoveComponentReply);
+
+    /* Get the current position of the seat */
+    rpc CurrentPosition(CurrentPositionRequest) returns (CurrentPositionReply);
+}
+
+/**
+ * @brief 
+ * 
+ */
+message MoveRequest {
+    Seat seat = 1; // The desired seat position
+}
+
+/**
+ * @brief 
+ * 
+ */
+message MoveReply {}
+
+/**
+ * @brief 
+ * 
+ */
+message MoveComponentRequest {
+    SeatLocation seat = 1; // The seat location to change
+    SeatComponent component = 2; // The component position to change
+    int32 position = 3; // The desired position to move the component to
+}
+
+/**
+ * @brief 
+ * 
+ */
+message MoveComponentReply {}
+
+/**
+ * @brief 
+ * 
+ */
+message CurrentPositionRequest {
+    uint32 row = 1; // The desired seat to row query
+    uint32 index = 2; // The desired seat index to query
+}
+
+/**
+ * @brief 
+ * 
+ */
+message CurrentPositionReply {
+    Seat seat = 1; // The seat state that was requested
+}
+
+/**
+ * @brief The structure used to describe the seat's position in the vehicle
+ * 
+ */ 
+message Seat {
+    SeatLocation location = 1; // The location of the seat in the vehicle
+    Position position = 2; // The various positions of the seat
+}
+
+/**
+ * @brief The location of the seat in the vehicle
+ * 
+ */ 
+message SeatLocation {
+    uint32 row = 1; // The row, front 0 and +1 toward rear
+    uint32 index = 2; // The index within the row, 0 left most, +1 toward right
+}
+
+/**
+ * @brief The position of the entire seat
+ * 
+ */
+message Position {
+    int32 base = 1;    // The position of the base 0 front, 1000 back
+    int32 cushion = 2; // The position of the cushion 0 short, 1000 long
+    int32 lumbar = 3;  // The position of the lumbar support
+    int32 side_bolster = 4;   // The position of the side bolster
+    int32 head_restraint = 5; // The position of the head restraint 0 down, 1000 up
+}
+
+/**
+ * @brief 
+ * 
+ */
+enum SeatComponent {
+    BASE = 0;
+    CUSHION = 1;
+    LUMBAR = 2;
+    SIDE_BOLSTER  = 3;
+    HEAD_RESTRAINT = 4;
+}

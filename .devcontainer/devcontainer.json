@@ -1,0 +1,55 @@
+// ********************************************************************************
+// * Copyright (c) 2021 Contributors to the Eclipse Foundation
+// *
+// * See the NOTICE file(s) distributed with this work for additional
+// * information regarding copyright ownership.
+// *
+// * This program and the accompanying materials are made available under the
+// * terms of the Eclipse Public License 2.0 which is available at
+// * http://www.eclipse.org/legal/epl-2.0
+// *
+// * SPDX-License-Identifier: EPL-2.0
+// ********************************************************************************/
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
+// https://github.com/microsoft/vscode-dev-containers/tree/v0.194.3/containers/dapr-javascript-node
+{
+	"name": "Dapr for sdv",
+	"dockerFile": "Dockerfile${localEnv:DEVCONTAINER_PROXY}",
+	"runArgs": ["--init", "--privileged"],
+	"mounts": [
+		"source=dockerenv-${containerWorkspaceFolderBasename},target=/var/lib/docker,type=volume"],
+	"overrideCommand": false,
+
+	// Set *default* container specific settings.json values on container create.
+	"settings": {
+		"python.pythonPath": "/usr/local/bin/python",
+		"python.linting.enabled": true,
+		"python.linting.pylintEnabled": true,
+		"python.linting.pylintPath": "/usr/local/bin/pylint"
+	},
+
+	// Add the IDs of extensions you want installed when the container is created.
+	"extensions": [
+		"dbaeumer.vscode-eslint",
+		"ms-azuretools.vscode-dapr",
+		"ms-azuretools.vscode-docker",
+		"ms-vscode.vscode-typescript-tslint-plugin",
+		"ms-python.python",
+		"cschleiden.vscode-github-actions",
+		"ms-vscode.powershell",
+		"pspester.pester-test",
+		"ms-vsliveshare.vsliveshare-pack",
+		"rpdswtk.vsmqtt",
+		"dotjoshjohnson.xml",
+		"ms-kubernetes-tools.vscode-kubernetes-tools"
+	],
+
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	// "forwardPorts": [],
+
+	// Ensure Dapr is running on opening the container
+	"postCreateCommand": "bash .devcontainer/sdv/postCreateCommand.sh",
+	"postStartCommand": "bash .devcontainer/sdv/postStartCommand.sh",
+	// Comment out connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root.
+	"remoteUser": "vscode"
+}
