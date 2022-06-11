@@ -1,0 +1,11 @@
+{
+    "mosquitto": {
+        "version": "1.6.9"
+    },
+    "databroker": {
+        "version": "v0.10.0"
+    },
+    "seatservice":{
+        "version": "v0.10.0"
+    }
+}

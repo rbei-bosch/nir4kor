@@ -1,0 +1,10 @@
+proto < ./proto/broker.proto
+
+@port=30555
+
+GRPC localhost:{{port}}/sdv.edge.databroker.broker.Broker/GetDatapoints
+{
+    "datapoints": [
+        "Vehicle.Cabin.Seat.Row1.Pos1.Position"
+    ]
+}

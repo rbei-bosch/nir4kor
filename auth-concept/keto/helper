@@ -1,0 +1,11 @@
+terminal1:
+./keto-init.sh
+
+terminal2: 
+export KETO_READ_REMOTE="127.0.0.1:4433"
+keto relation-tuple get --namespace bmw
+keto check consumer_1 select bmw speed
+keto check consumer_1 select bmw trip
+keto check publisher_1 insert bmw speed
+keto check publisher_1 insert bmw trip
+keto relation-tuple get --namespace mb

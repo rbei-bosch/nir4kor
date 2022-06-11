@@ -1,0 +1,38 @@
+
+Download nginx:
+run example/dynamic grpc greeter_server/client
+
+nginx: 
+sudo apt-get install fcgiwrap
+sudo nano /etc/nginx/conf.d/grpc.conf
+sudo cat /var/log/nginx/access.log
+sudo service nginx start
+
+/etc/nginx/conf.d/scripts/authorization.sh
+
+Openresty:
+sudo apt-get -y install --no-install-recommends wget gnupg ca-certificates
+wget -O - https://openresty.org/package/pubkey.gpg | sudo apt-key add -
+echo "deb http://openresty.org/package/arm64/ubuntu $(lsb_release -sc) main" \
+    | sudo tee /etc/apt/sources.list.d/openresty.list
+sudo apt-get update
+sudo apt-get -y install openresty
+
+cd /usr/local/openresty/nginx
+sudo nginx -p `pwd`/ -c conf/nginx.conf
+
+
+
+#####
+server {
+        listen 81 http2;
+ 
+        location / {
+
+                # 1. Extract DAPRD [ APP-ID]
+                # 2. Pass APP-ID into check script 
+                # 3. Verify APP-ID and permissions with Keto
+                # 4. Allow or reject call           
+                grpc_pass grpc://localhost:50033;
+        }
+    }

@@ -1,0 +1,13 @@
+proto < ./proto/swdc_comfort_seats.proto
+
+@port=30051
+
+GRPC localhost:{{port}}/swdc.comfort.Seats/MoveComponent
+{
+    "seat": {
+        "row": 0,
+        "index": 0
+    },
+    "component": 0,
+    "position": 300
+}

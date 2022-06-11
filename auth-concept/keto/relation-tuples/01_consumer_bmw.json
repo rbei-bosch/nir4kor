@@ -1,0 +1,14 @@
+[
+  {
+    "namespace": "bmw",
+    "object": "speed",
+    "relation": "select",
+    "subject_id": "consumer_1"
+  },
+  {
+    "namespace": "bmw",
+    "object": "gps",
+    "relation": "select",
+    "subject_id": "consumer_1"
+  }
+]

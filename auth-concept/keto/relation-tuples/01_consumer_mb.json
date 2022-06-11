@@ -1,0 +1,8 @@
+[
+  {
+    "namespace": "mb",
+    "object": "speed",
+    "relation": "select",
+    "subject_id": "consumer_1"
+  }
+]

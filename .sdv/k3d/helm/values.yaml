@@ -1,0 +1,31 @@
+imageSeatService:
+  name: seatservice
+  repository: k3d-devregistry.localhost:12345/seatservice
+  pullPolicy: Always
+  daprAppid: seatservice
+  daprAppPort: 50051
+  daprLogLevel: debug
+  tag: latest
+  nodePort: 30051
+
+imageVehicleDataBroker:
+  name: vehicledatabroker
+  repository: k3d-devregistry.localhost:12345/vehicledatabroker
+  pullPolicy: Always
+  daprAppid: vehicledatabroker
+  daprAppPort: 55555
+  daprLogLevel: debug
+  tag: latest
+  nodePort: 30555
+
+imageMosquitto:
+  name: mqtt-broker
+  repository: eclipse-mosquitto
+  pullPolicy: IfNotPresent
+  tag: 1.6.12
+  port: 1883
+  nodePort: 31883
+  websocketPort: 9001
+
+nameOverride: ""
+fullnameOverride: ""

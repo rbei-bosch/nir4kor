@@ -1,0 +1,14 @@
+[
+    {
+      "namespace": "bmw",
+      "object": "speed",
+      "relation": "select",
+      "subject_id": "SeatService"
+    },
+    {
+      "namespace": "bmw",
+      "object": "seat position ",
+      "relation": "select",
+      "subject_id": "SeatService"
+    }
+  ]

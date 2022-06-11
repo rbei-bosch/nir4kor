@@ -1,0 +1,14 @@
+[
+  {
+    "namespace": "mb",
+    "object": "gps",
+    "relation": "select",
+    "subject_id": "consumer_2"
+  },
+  {
+    "namespace": "mb",
+    "object": "battery",
+    "relation": "select",
+    "subject_id": "consumer_2"
+  }
+]
