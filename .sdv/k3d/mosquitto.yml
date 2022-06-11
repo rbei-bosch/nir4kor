@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mqtt-broker
+  labels:
+    app-name: mqtt-broker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app-name: mqtt-broker
+  template:
+    metadata:
+      labels:
+        app-name: mqtt-broker
+    spec:
+      containers:
+        - name: mqtt
+          image: eclipse-mosquitto:1.6.12
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: default
+              containerPort: 1883
+              protocol: TCP
+            - name: websocket
+              containerPort: 9001
+              protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mqtt-broker
+  labels:
+    app-name: mqtt-broker
+spec:
+  type: ClusterIP
+  selector:
+    app-name: mqtt-broker
+  ports:
+    - port: 1883
+      targetPort: default
+      name: default
+      protocol: TCP
+    - port: 9001
+      targetPort: websocket
+      name: websocket
+      protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mqtt-broker-ext
+spec:
+  type: NodePort
+  selector:
+    app-name: mqtt-broker
+  ports:
+  - port: 1883
+    targetPort: 1883
+    nodePort: 31883

@@ -1,0 +1,20 @@
+imageSeatAdjusterApp:
+  name: seat-adjuster-app
+  repository: local/seat-adjuster-app
+  pullPolicy: Always
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "#SuccessfulExecutionOfReleaseWorkflowUpdatesThisValueToReleaseVersionWithoutV#"
+  daprAppid: seat-adjuster-app
+  daprPort: 50008
+
+imageVehicleApi:
+  name: vehicle-api
+  repository: swdceuwedevgsopscr.azurecr.io/vehicleapi
+  pullPolicy: Always
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "#SuccessfulExecutionOfReleaseWorkflowUpdatesThisValueToReleaseVersionWithoutV#"
+  daprAppid: vehicleapi
+  daprPort: 50051
+
+nameOverride: ""
+fullnameOverride: ""

@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{.Values.imageVehicleApi.name}}
+  labels:
+    app: {{.Values.imageVehicleApi.name}}
+spec:
+  selector:
+    matchLabels:
+      app: {{.Values.imageVehicleApi.name}}
+  template:
+    metadata:
+      annotations:
+        dapr.io/enabled: "true"
+        dapr.io/app-id: "{{.Values.imageVehicleApi.daprAppid}}"
+        dapr.io/app-port: "{{.Values.imageVehicleApi.daprPort}}"
+        dapr.io/log-level: "debug"
+        dapr.io/config: "config"
+        dapr.io/app-protocol: "grpc"
+      labels:
+        app: {{.Values.imageVehicleApi.name}}
+        {{- include "helm.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: {{.Values.imageVehicleApi.name}}
+          image: "{{ .Values.imageVehicleApi.repository }}:{{ .Values.imageVehicleApi.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.imageVehicleApi.pullPolicy }}

@@ -1,0 +1,18 @@
+imageSeatAdjusterApp:
+  name: seat-adjuster-app
+  repository: k3d-devregistry.localhost:12345/seat-adjuster-app
+  pullPolicy: Always
+  tag: "local"
+  daprAppid: app-skeleton
+  daprPort: 50008
+
+imageVehicleApi:
+  name: vehicle-api
+  repository: k3d-devregistry.localhost:12345/vehicleapi
+  pullPolicy: Always
+  tag: "local"
+  daprAppid: vehicleapi
+  daprPort: 50051
+
+nameOverride: ""
+fullnameOverride: ""

@@ -1,0 +1,18 @@
+#!/bin/sh
+
+echo "Script executed from: ${PWD}"
+temp=$OTA_SYSTEM_CREDENTIALS
+
+CONTAINER_REGISTRY=$(echo $temp | jq -r '.CONTAINER_REGISTRY')
+
+REGISTRY_USER=$(echo $temp | jq -r '.REGISTRY_USER')
+
+REGISTRY_PASSWORD=$(echo $temp | jq -r '.REGISTRY_PASSWORD')
+
+echo "::add-mask::$REGISTRY_PASSWORD"
+
+echo "CONTAINER_REGISTRY=$CONTAINER_REGISTRY" >> $GITHUB_ENV
+echo "REGISTRY_USER=$REGISTRY_USER" >> $GITHUB_ENV
+echo "REGISTRY_PASSWORD=$REGISTRY_PASSWORD" >> $GITHUB_ENV
+
+printenv

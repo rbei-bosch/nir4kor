@@ -1,0 +1,18 @@
+[
+    {
+        "Name": "vehicleapi",
+        "Folder": "SITE_PACKAGES/sdv/vehicle_api_mock",
+        "StartProgram": "vehicleapi.py",
+        "Port": 50051,
+        "IsPublisher": 1,
+        "DockerFolder": "SITE_PACKAGES/sdv"
+    },
+    {
+        "Name": "seat-adjuster-app",
+        "Folder": "src",
+        "StartProgram": "run.py",
+        "Port": 50008,
+        "IsPublisher": 1,
+        "DockerFolder": "."
+    }
+]

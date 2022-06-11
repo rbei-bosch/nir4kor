@@ -1,0 +1,35 @@
+# syntax=docker/dockerfile:1.2
+
+FROM python:3.9-alpine as base
+
+# Build stage, to create a Virtual Environent
+FROM base as builder
+
+RUN apk update && apk upgrade 
+RUN apk add gcc g++ libstdc++ gcompat linux-headers
+
+ADD ./ /
+
+RUN python3 -m venv /opt/venv
+
+ENV PATH="/opt/venv/bin:$PATH"
+
+RUN --mount=type=secret,id=github_token credential=$(cat /run/secrets/github_token); apk add git \
+    && /opt/venv/bin/python3 -m pip install --upgrade pip \
+    && pip3 install --no-cache-dir -r requirements.txt \
+    && pip3 install --no-cache-dir git+https://${credential}@github.com/SoftwareDefinedVehicle/sdv-vehicle-app-python-sdk.git@v0.1.9
+
+RUN pip3 install pyinstaller
+RUN pyinstaller run.py
+
+# Runner stage, to copy in the virtual environment and the app
+FROM alpine
+
+COPY --from=builder ./dist/run /dist
+
+WORKDIR /dist
+
+LABEL org.opencontainers.image.source="https://github.com/softwaredefinedvehicle/vehicle-app-python-template"
+
+ENTRYPOINT ["/dist/run"]
+# CMD ["run.py"]
