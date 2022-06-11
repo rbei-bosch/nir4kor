@@ -1,0 +1,8 @@
+grpcio
+protobuf
+dapr
+cloudevents
+opentelemetry-api
+opentelemetry-sdk
+opentelemetry-distro
+opentelemetry-instrumentation-logging
